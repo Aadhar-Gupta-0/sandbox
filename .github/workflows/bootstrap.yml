@@ -113,6 +113,7 @@ jobs:
           test ! -e yarn-error.log
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          rm -f .github/workflows/ci.yml
           git add -A
           git commit -m 'Improve BlockNote editor lab with local JSON export'
           git push origin HEAD:main
