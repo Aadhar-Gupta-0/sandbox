@@ -1,0 +1,9 @@
+name: BlockNote source checks
+on: [push, pull_request]
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: test -s pages/index.tsx && test -s package.json && test -s README.md
+      - run: test ! -e yarn-error.log
