@@ -2,6 +2,7 @@ import { DefaultBlockSchema } from "@blocknote/core";
 import "@blocknote/core/style.css";
 import { BlockNoteView, useBlockNote } from "@blocknote/react";
 import { useState } from "react";
+import { blocksToPlainText, documentWordCount } from "../lib/documentTools";
 
 const MAX_EXPORT_BYTES = 2 * 1024 * 1024;
 
@@ -12,6 +13,20 @@ function EditorSandbox() {
     onEditorContentChange: () => setChangeCount((n) => n + 1),
     theme: "light",
   });
+
+  const plainText = blocksToPlainText(editor.topLevelBlocks);
+  const wordCount = documentWordCount(plainText);
+
+  function exportText() {
+    const text = blocksToPlainText(editor.topLevelBlocks);
+    const url = URL.createObjectURL(new Blob([text], {type: "text/plain;charset=utf-8"}));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "sandbox-document.txt";
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+    setMessage("Plain-text document exported locally.");
+  }
 
   function exportJson() {
     const text = JSON.stringify(editor.topLevelBlocks, null, 2);
@@ -35,7 +50,10 @@ function EditorSandbox() {
         <button onClick={exportJson} style={{ background: "#5846c4", color: "white", border: 0, borderRadius: 10, padding: "12px 20px", cursor: "pointer" }}>
           Download JSON
         </button>
-        <span style={{ marginLeft: 14, fontSize: 13, color: "#64748b" }}>{changeCount} editor updates</span>
+        <button onClick={exportText} style={{ marginLeft: 10, background: "#eae7ff", color: "#31257b", border: 0, borderRadius: 10, padding: "12px 20px", cursor: "pointer" }}>
+          Download .txt
+        </button>
+        <span style={{ marginLeft: 14, fontSize: 13, color: "#64748b" }}>{wordCount} words · {changeCount} editor updates</span>
       </header>
       <section aria-label="Block editor" style={{ background: "#fff", border: "1px solid #ececf3", borderRadius: 16, minHeight: 280, padding: "24px 8px" }}>
         <BlockNoteView editor={editor} />
