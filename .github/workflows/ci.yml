@@ -6,4 +6,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: test -s pages/index.tsx && test -s package.json && test -s README.md
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - run: test ! -e yarn-error.log
+      - run: node --experimental-strip-types --test lib/documentTools.test.mjs
