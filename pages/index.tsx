@@ -2,7 +2,7 @@ import { DefaultBlockSchema } from "@blocknote/core";
 import "@blocknote/core/style.css";
 import { BlockNoteView, useBlockNote } from "@blocknote/react";
 import { useState } from "react";
-import { blocksToPlainText, documentWordCount } from "../lib/documentTools";
+import { blocksToPlainText, documentWordCount, canExportText } from "../lib/documentTools";
 
 const MAX_EXPORT_BYTES = 2 * 1024 * 1024;
 
@@ -19,6 +19,10 @@ function EditorSandbox() {
 
   function exportText() {
     const text = blocksToPlainText(editor.topLevelBlocks);
+    if (!canExportText(text, MAX_EXPORT_BYTES)) {
+      setMessage("Document is too large to export in this demo.");
+      return;
+    }
     const url = URL.createObjectURL(new Blob([text], {type: "text/plain;charset=utf-8"}));
     const link = document.createElement("a");
     link.href = url;
@@ -30,14 +34,14 @@ function EditorSandbox() {
 
   function exportJson() {
     const text = JSON.stringify(editor.topLevelBlocks, null, 2);
-    if (new Blob([text]).size > MAX_EXPORT_BYTES) {
+    if (!canExportText(text, MAX_EXPORT_BYTES)) {
       setMessage("Document is too large to export in this demo.");
       return;
     }
     const url = URL.createObjectURL(new Blob([text], { type: "application/json" }));
     const link = document.createElement("a");
     link.href = url; link.download = "sandbox-document.json"; link.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 0);
     setMessage("Document exported locally. No server upload occurred.");
   }
 
