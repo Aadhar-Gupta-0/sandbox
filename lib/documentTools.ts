@@ -23,3 +23,11 @@ export function documentWordCount(text: string): number {
   const content = text.trim();
   return content ? content.split(/\s+/).length : 0;
 }
+
+/** Browser-safe export limit check using UTF-8 byte size, not JS string length. */
+export function canExportText(text: string, maxBytes = 2 * 1024 * 1024): boolean {
+  if (!Number.isSafeInteger(maxBytes) || maxBytes < 1) {
+    throw new RangeError('maxBytes must be a positive integer');
+  }
+  return new TextEncoder().encode(text).byteLength <= maxBytes;
+}
